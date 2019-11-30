@@ -4,12 +4,22 @@ vk = vk_api.VkApi(token=token)
 longpoll = VkLongPoll(vk)
 
 for event in longpoll.listen():
-
     # Если пришло новое сообщение
     if event.type == VkEventType.MESSAGE_NEW:
 
         # Если оно имеет метку для меня( то есть бота)
         if event.to_me:
+
+            # Сообщение от пользователя
+            request = event.text
+
+            # Каменная логика ответа
+            if request == "привет":
+                write_msg(event.user_id, "Хай")
+            elif request == "пока":
+                write_msg(event.user_id, "Пока((")
+            else:
+                write_msg(event.user_id, "Не поняла вашего ответа...")
 
 
 #функция работы с местополжения
