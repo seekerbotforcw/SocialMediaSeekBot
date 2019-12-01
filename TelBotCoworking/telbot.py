@@ -37,9 +37,9 @@ def help_command(message):
         'С его помощью Вы сможете найти рабочее место для\n' +
         'выполнения возникших задач.',
         reply_markup=keyboard
-    )   
+    )
 
-@bot.message_handler(commands=["geo"])
+@bot.message_handler(commands=['geo'])
 def geo(message):
     keyboard = types.ReplyKeyboardMarkup(row_width=1, resize_keyboard=True)
     button_geo = types.KeyboardButton(text="Отправить местоположение, и я помогу тебе найти тебе место для работы", request_location=True)
@@ -52,6 +52,26 @@ a=s.replace("\n","|").split('|')
 f.close()
 c=[a[d:d+3] for d in range(0, len(a), 3)]
 dist=5
+
+@bot.message_handler(content_types=['text'])
+def handle_text_messages(message):
+    if message.text.lower() == "привет":
+        bot.send_message(message.from_user.id, "Привет")
+    elif message.text.lower() == "кто ты?":
+        bot.send_message(message.from_user.id, "Я чатбот для поиска коворкинга.")
+    elif message.text.lower() == "как тебя зовут?":
+        bot.send_message(message.from_user.id, "Меня зовут FindingBot.")
+    else:
+        keyboard = types.ReplyKeyboardMarkup(row_width=1, resize_keyboard=True)
+        button_geo = types.KeyboardButton(text="Отправить местоположение, и я помогу тебе найти тебе место для работы",
+                                          request_location=True)
+        keyboard.add(button_geo)
+        bot.send_message(message.chat.id, "Я тебя не понимаю. Напиши что-то другое. "
+                                          "Но ты можешь поделиться со мной"
+                                          " своей геопозицией, и я расскажу "
+                                          "тебе ближайших местах для работы.",
+                                            reply_markup=keyboard)
+        bot.send_sticker(message.chat.id, 'CAADAgADaR0AAulVBRitKUu7IjoodxYE')
 
 @bot.message_handler(content_types=["location"])
 def location(message):
