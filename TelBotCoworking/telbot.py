@@ -15,16 +15,36 @@ def haversine(lat1, lon1, lat2, lon2):
     km = 6367 * c
     return km
 
+@bot.message_handler(commands=["start"])
+def start_command(message):
+    bot.send_message(
+        message.chat.id,
+        'Здравствуй, друг, ты попал ко мне скорее всего\n' +
+        'в поиске места для работы. Ну что ж, я помогу тебе.\n' +
+        'Набирай /geo и жди результаты.'
+  )
+@bot.message_handler(commands=['help'])
+def help_command(message):
+    keyboard = telebot.types.InlineKeyboardMarkup()
+    keyboard.add(
+        telebot.types.InlineKeyboardButton(
+            'Связаться с разработчиками', url='telegram.me/Qqqlx'
+  )
+    )
+    bot.send_message(
+        message.chat.id,
+        'Данный бот для поиска свободного пространства (коворкинга).\n' +
+        'С его помощью Вы сможете найти рабочее место для\n' +
+        'выполнения возникших задач.',
+        reply_markup=keyboard
+    )   
+
 @bot.message_handler(commands=["geo"])
 def geo(message):
     keyboard = types.ReplyKeyboardMarkup(row_width=1, resize_keyboard=True)
-    button_geo = types.KeyboardButton(text="Отправить местоположение", request_location=True)
+    button_geo = types.KeyboardButton(text="Отправить местоположение, и я помогу тебе найти тебе место для работы", request_location=True)
     keyboard.add(button_geo)
     bot.send_message(message.chat.id, "Привет! Нажми на кнопку и передай мне свое местоположение", reply_markup=keyboard)
-
-
-along=[59.9139503, 59.9080238]
-alat=[30.4490375, 30.3512545]
 
 f=open("db.txt","r+",encoding="utf8")
 s=(f.read())
@@ -49,9 +69,7 @@ def location(message):
                 lat=float(c[i][1])
                 long=float(c[i][2])
                 ind=i
-        # for i in range(len(along)):
         bot.send_location(message.chat.id, lat, long)
-        bot.send_message(message.chat.id, "Расстояние в км до коворкинга "+str(c[ind][0])+" примерно " + str(round(answ,2))+" км")
+        bot.send_message(message.chat.id, "Расстояние до коворкинга "+str(c[ind][0])+" примерно " + str(round(answ,2))+" км")
+        bot.send_message(message.chat.id, "Если захочешь снова помощи, пиши мне!")
 bot.polling()
-
-
