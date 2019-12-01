@@ -47,13 +47,13 @@ vk_session = vk.get_api()
 
 def write_msg(user_id, message):
     vk.method('messages.send', {'user_id': user_id, 'message': message, 'random_id': time.time()})
-
+def write_stik(user_id, stickerid):
+    vk.method('messages.sendSticker',{'user_id': user_id, 'sticker_id':  stickerid, 'random_id': time.time()})
 
 for event in longpoll.listen():
     if event.type == VkEventType.MESSAGE_NEW:
         if event.to_me:
             request = event.text
-
             r = event.__dict__
             print(vk.method("messages.getConversations", {"offset": 0, "count": 20, "filter": 'unanswered'}))
             idd = vk.method("messages.getConversations", {"offset": 0, "count": 20, "filter": 'unanswered'})
@@ -63,32 +63,29 @@ for event in longpoll.listen():
             print(ID_last)
 
             if request == '':
-                if vk.method("messages.getById", {"message_ids": ID_last })["items"][0]["geo"] is not []:
-                    print(vk.method("messages.getById", {"message_ids": ID_last })["items"][0]["geo"])
-                    coord = vk.method("messages.getById", {"message_ids": ID_last })["items"][0]["geo"]
-                    coord = coord['coordinates']
-                    print(coord)
-                    latitude = coord['latitude']
-                    longitude = coord['longitude']
-                    print(latitude)
-                    print(longitude)
-                    distance = haversine(latitude,longitude,lat2,lon2)
-                    write_msg(event.user_id, "Ближайший " + str(distance) + " km" + '\n' + 'https://www.google.ru/maps/search/' + str(lat2) + '+' + str(lon2))
-
-
-
-
-                else:
-                    print("медиавложений нет")
-
-            print(r)
-
-            if request == "Привет":
+                try:
+                    if vk.method("messages.getById", {"message_ids": ID_last })["items"][0]["geo"] is not []:
+                        print(vk.method("messages.getById", {"message_ids": ID_last })["items"][0]["geo"])
+                        coord = vk.method("messages.getById", {"message_ids": ID_last })["items"][0]["geo"]
+                        coord = coord['coordinates']
+                        print(coord)
+                        latitude = coord['latitude']
+                        longitude = coord['longitude']
+                        print(latitude)
+                        print(longitude)
+                        distance = round(haversine(latitude,longitude,lat2,lon2), 2)
+                        write_msg(event.user_id, "Ближайший " + str(distance) + " km" + '\n' + 'https://www.google.ru/maps/search/' + str(lat2) + '+' + str(lon2))
+                except KeyError:
+                    write_msg(event.user_id, 'Я не могу это увидеть ;(')
+            elif request == "Привет":
                 vk.method("messages.send", {"peer_id": event.peer_id, "message": "Новые кнопки", "random_id": 0,
-                                            "keyboard": keyboard})
+                                                "keyboard": keyboard})
                 write_msg(event.user_id, "Хай")
             elif request == "Пока":
                 write_msg(event.user_id, "Пока((")
                 break
             else:
                 write_msg(event.user_id, "Не поняла вашего ответа...")
+
+
+
